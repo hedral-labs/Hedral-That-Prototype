@@ -456,7 +456,54 @@ const createSceneControls = () => {
   
   controlsDiv.appendChild(viewControlsDiv);
 
-  // Shadows Toggle
+
+  // Lighting Options (Expandable)
+  const lightingSection = document.createElement("div");
+  lightingSection.style.marginBottom = "1rem";
+  
+  const lightingHeader = document.createElement("div");
+  lightingHeader.style.display = "flex";
+  lightingHeader.style.alignItems = "center";
+  lightingHeader.style.justifyContent = "space-between";
+  lightingHeader.style.cursor = "pointer";
+  lightingHeader.style.padding = "0.5rem 0";
+  lightingHeader.style.borderBottom = "1px solid var(--border-color)";
+  lightingHeader.style.marginBottom = "0.75rem";
+  
+  const lightingTitle = document.createElement("h3");
+  lightingTitle.className = "panel-title";
+  lightingTitle.style.margin = "0";
+  lightingTitle.style.fontSize = "0.875rem";
+  lightingTitle.textContent = "Lighting";
+  lightingHeader.appendChild(lightingTitle);
+  
+  const lightingToggle = document.createElement("span");
+  lightingToggle.style.fontSize = "0.75rem";
+  lightingToggle.style.color = "var(--accent-color)";
+  lightingToggle.style.transition = "transform 0.2s";
+  lightingToggle.textContent = "▼";
+  lightingHeader.appendChild(lightingToggle);
+  
+  const lightingContent = document.createElement("div");
+  lightingContent.id = "lightingContent";
+  lightingContent.style.display = "none";
+  lightingContent.style.paddingTop = "0.75rem";
+  
+  let lightingExpanded = false;
+  lightingHeader.addEventListener("click", () => {
+    lightingExpanded = !lightingExpanded;
+    if (lightingExpanded) {
+      lightingContent.style.display = "block";
+      lightingToggle.textContent = "▲";
+      lightingToggle.style.transform = "rotate(0deg)";
+    } else {
+      lightingContent.style.display = "none";
+      lightingToggle.textContent = "▼";
+      lightingToggle.style.transform = "rotate(0deg)";
+    }
+  });
+  
+  // Shadows Toggle (inside lighting section)
   const shadowsControl = document.createElement("div");
   shadowsControl.style.marginBottom = "1rem";
   
@@ -483,9 +530,87 @@ const createSceneControls = () => {
   shadowsLabel.appendChild(shadowsText);
   shadowsLabel.appendChild(shadowsCheckbox);
   shadowsControl.appendChild(shadowsLabel);
-  controlsDiv.appendChild(shadowsControl);
+  lightingContent.appendChild(shadowsControl);
+  
+  // Ambient Light Intensity
+  const ambientIntensityControl = document.createElement("div");
+  ambientIntensityControl.style.marginBottom = "1rem";
+  
+  const ambientIntensityLabel = document.createElement("label");
+  ambientIntensityLabel.style.display = "block";
+  ambientIntensityLabel.style.fontSize = "0.75rem";
+  ambientIntensityLabel.style.color = "var(--text-muted)";
+  ambientIntensityLabel.style.marginBottom = "0.5rem";
+  ambientIntensityLabel.textContent = "Ambient Light";
+  ambientIntensityControl.appendChild(ambientIntensityLabel);
+  
+  const ambientIntensityInput = document.createElement("input");
+  ambientIntensityInput.type = "range";
+  ambientIntensityInput.id = "ambientIntensityInput";
+  ambientIntensityInput.min = "0";
+  ambientIntensityInput.max = "10";
+  ambientIntensityInput.step = "0.1";
+  ambientIntensityInput.value = world.scene.config.ambientLight.intensity.toString();
+  ambientIntensityInput.style.width = "100%";
+  ambientIntensityInput.style.cursor = "pointer";
+  
+  const ambientIntensityValue = document.createElement("span");
+  ambientIntensityValue.style.display = "block";
+  ambientIntensityValue.style.fontSize = "0.75rem";
+  ambientIntensityValue.style.color = "var(--text-muted)";
+  ambientIntensityValue.style.marginTop = "0.25rem";
+  ambientIntensityValue.textContent = world.scene.config.ambientLight.intensity.toFixed(1);
+  
+  ambientIntensityInput.addEventListener("input", () => {
+    const value = parseFloat(ambientIntensityInput.value);
+    world.scene.config.ambientLight.intensity = value;
+    ambientIntensityValue.textContent = value.toFixed(1);
+  });
+  
+  ambientIntensityControl.appendChild(ambientIntensityInput);
+  ambientIntensityControl.appendChild(ambientIntensityValue);
+  lightingContent.appendChild(ambientIntensityControl);
 
-  // Shadow Resolution
+  // Directional Light Intensity
+  const directionalIntensityControl = document.createElement("div");
+  directionalIntensityControl.style.marginBottom = "1rem";
+  
+  const directionalIntensityLabel = document.createElement("label");
+  directionalIntensityLabel.style.display = "block";
+  directionalIntensityLabel.style.fontSize = "0.75rem";
+  directionalIntensityLabel.style.color = "var(--text-muted)";
+  directionalIntensityLabel.style.marginBottom = "0.5rem";
+  directionalIntensityLabel.textContent = "Directional Light";
+  directionalIntensityControl.appendChild(directionalIntensityLabel);
+  
+  const directionalIntensityInput = document.createElement("input");
+  directionalIntensityInput.type = "range";
+  directionalIntensityInput.id = "directionalIntensityInput";
+  directionalIntensityInput.min = "0";
+  directionalIntensityInput.max = "10";
+  directionalIntensityInput.step = "0.1";
+  directionalIntensityInput.value = world.scene.config.directionalLight.intensity.toString();
+  directionalIntensityInput.style.width = "100%";
+  directionalIntensityInput.style.cursor = "pointer";
+  
+  const directionalIntensityValue = document.createElement("span");
+  directionalIntensityValue.style.display = "block";
+  directionalIntensityValue.style.fontSize = "0.75rem";
+  directionalIntensityValue.style.color = "var(--text-muted)";
+  directionalIntensityValue.style.marginTop = "0.25rem";
+  directionalIntensityValue.textContent = world.scene.config.directionalLight.intensity.toFixed(1);
+  
+  directionalIntensityInput.addEventListener("input", () => {
+    const value = parseFloat(directionalIntensityInput.value);
+    world.scene.config.directionalLight.intensity = value;
+    directionalIntensityValue.textContent = value.toFixed(1);
+  });
+  
+  directionalIntensityControl.appendChild(directionalIntensityInput);
+  directionalIntensityControl.appendChild(directionalIntensityValue);
+  lightingContent.appendChild(directionalIntensityControl);
+
+  // Shadow Resolution (inside lighting section)
   const shadowResControl = document.createElement("div");
   shadowResControl.style.marginBottom = "1rem";
   
@@ -528,85 +653,11 @@ const createSceneControls = () => {
   
   shadowResControl.appendChild(shadowResInput);
   shadowResControl.appendChild(shadowResValue);
-  controlsDiv.appendChild(shadowResControl);
-
-  // Ambient Light Intensity
-  const ambientIntensityControl = document.createElement("div");
-  ambientIntensityControl.style.marginBottom = "1rem";
+  lightingContent.appendChild(shadowResControl);
   
-  const ambientIntensityLabel = document.createElement("label");
-  ambientIntensityLabel.style.display = "block";
-  ambientIntensityLabel.style.fontSize = "0.75rem";
-  ambientIntensityLabel.style.color = "var(--text-muted)";
-  ambientIntensityLabel.style.marginBottom = "0.5rem";
-  ambientIntensityLabel.textContent = "Ambient Light";
-  ambientIntensityControl.appendChild(ambientIntensityLabel);
-  
-  const ambientIntensityInput = document.createElement("input");
-  ambientIntensityInput.type = "range";
-  ambientIntensityInput.id = "ambientIntensityInput";
-  ambientIntensityInput.min = "0";
-  ambientIntensityInput.max = "10";
-  ambientIntensityInput.step = "0.1";
-  ambientIntensityInput.value = world.scene.config.ambientLight.intensity.toString();
-  ambientIntensityInput.style.width = "100%";
-  ambientIntensityInput.style.cursor = "pointer";
-  
-  const ambientIntensityValue = document.createElement("span");
-  ambientIntensityValue.style.display = "block";
-  ambientIntensityValue.style.fontSize = "0.75rem";
-  ambientIntensityValue.style.color = "var(--text-muted)";
-  ambientIntensityValue.style.marginTop = "0.25rem";
-  ambientIntensityValue.textContent = world.scene.config.ambientLight.intensity.toFixed(1);
-  
-  ambientIntensityInput.addEventListener("input", () => {
-    const value = parseFloat(ambientIntensityInput.value);
-    world.scene.config.ambientLight.intensity = value;
-    ambientIntensityValue.textContent = value.toFixed(1);
-  });
-  
-  ambientIntensityControl.appendChild(ambientIntensityInput);
-  ambientIntensityControl.appendChild(ambientIntensityValue);
-  controlsDiv.appendChild(ambientIntensityControl);
-
-  // Directional Light Intensity
-  const directionalIntensityControl = document.createElement("div");
-  directionalIntensityControl.style.marginBottom = "1rem";
-  
-  const directionalIntensityLabel = document.createElement("label");
-  directionalIntensityLabel.style.display = "block";
-  directionalIntensityLabel.style.fontSize = "0.75rem";
-  directionalIntensityLabel.style.color = "var(--text-muted)";
-  directionalIntensityLabel.style.marginBottom = "0.5rem";
-  directionalIntensityLabel.textContent = "Directional Light";
-  directionalIntensityControl.appendChild(directionalIntensityLabel);
-  
-  const directionalIntensityInput = document.createElement("input");
-  directionalIntensityInput.type = "range";
-  directionalIntensityInput.id = "directionalIntensityInput";
-  directionalIntensityInput.min = "0";
-  directionalIntensityInput.max = "10";
-  directionalIntensityInput.step = "0.1";
-  directionalIntensityInput.value = world.scene.config.directionalLight.intensity.toString();
-  directionalIntensityInput.style.width = "100%";
-  directionalIntensityInput.style.cursor = "pointer";
-  
-  const directionalIntensityValue = document.createElement("span");
-  directionalIntensityValue.style.display = "block";
-  directionalIntensityValue.style.fontSize = "0.75rem";
-  directionalIntensityValue.style.color = "var(--text-muted)";
-  directionalIntensityValue.style.marginTop = "0.25rem";
-  directionalIntensityValue.textContent = world.scene.config.directionalLight.intensity.toFixed(1);
-  
-  directionalIntensityInput.addEventListener("input", () => {
-    const value = parseFloat(directionalIntensityInput.value);
-    world.scene.config.directionalLight.intensity = value;
-    directionalIntensityValue.textContent = value.toFixed(1);
-  });
-  
-  directionalIntensityControl.appendChild(directionalIntensityInput);
-  directionalIntensityControl.appendChild(directionalIntensityValue);
-  controlsDiv.appendChild(directionalIntensityControl);
+  lightingSection.appendChild(lightingHeader);
+  lightingSection.appendChild(lightingContent);
+  controlsDiv.appendChild(lightingSection);
 
   return controlsDiv;
 };
