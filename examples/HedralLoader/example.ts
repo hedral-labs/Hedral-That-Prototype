@@ -2,7 +2,30 @@ import Stats from "stats.js";
 // @ts-ignore - Vite resolves this at runtime via alias configuration
 import * as BUI from "@thatopen/ui";
 import * as OBC from "@thatopen/components";
+import * as THREE from "three";
 
+// UI Elements
+const fileInput = document.getElementById("fileInput") as HTMLInputElement;
+const loadBtn = document.getElementById("loadBtn") as HTMLButtonElement;
+const resetCameraBtn = document.getElementById("resetCameraBtn") as HTMLButtonElement;
+const fitToViewBtn = document.getElementById("fitToViewBtn") as HTMLButtonElement;
+const leftPanel = document.getElementById("leftPanel") as HTMLDivElement;
+const rightPanel = document.getElementById("rightPanel") as HTMLDivElement;
+const leftPanelToggle = document.getElementById("leftPanelToggle") as HTMLButtonElement;
+const rightPanelToggle = document.getElementById("rightPanelToggle") as HTMLButtonElement;
+const leftPanelContent = document.getElementById("leftPanelContent") as HTMLDivElement;
+const loadingOverlay = document.getElementById("loadingOverlay") as HTMLDivElement;
+const fileIndicator = document.getElementById("fileIndicator") as HTMLDivElement;
+const fileName = document.getElementById("fileName") as HTMLSpanElement;
+const modelInfo = document.getElementById("modelInfo") as HTMLDivElement;
+const fpsStat = document.getElementById("fpsStat") as HTMLSpanElement;
+
+let isLoading = false;
+let loadedFileName: string | null = null;
+let leftPanelOpen = true;
+let rightPanelOpen = true;
+
+// Initialize components
 const components = new OBC.Components();
 
 const worlds = components.get(OBC.Worlds);
@@ -59,14 +82,14 @@ fragments.list.onItemSet.add(({ value: model }) => {
   model.useCamera(world.camera.three);
   world.scene.three.add(model.object);
   fragments.core.update(true);
+  updateModelInfo();
 });
-
 
 const downloadFragments = async () => {
   const [model] = fragments.list.values();
   if (!model) return;
   const fragsBuffer = await model.getBuffer(false);
-  const file = new File([fragsBuffer], "school_str.frag");
+  const file = new File([fragsBuffer], loadedFileName?.replace('.ifc', '.frag') || "model.frag");
   const link = document.createElement("a");
   link.href = URL.createObjectURL(file);
   link.download = file.name;
@@ -74,6 +97,135 @@ const downloadFragments = async () => {
   URL.revokeObjectURL(link.href);
 };
 
+// UI Functions
+const setLoading = (loading: boolean) => {
+  isLoading = loading;
+  if (loading) {
+    loadingOverlay.classList.add("active");
+    loadBtn.disabled = true;
+  } else {
+    loadingOverlay.classList.remove("active");
+    loadBtn.disabled = false;
+  }
+};
+
+const updateFileIndicator = (name: string | null) => {
+  loadedFileName = name;
+  if (name) {
+    fileName.textContent = name;
+    fileIndicator.style.display = "block";
+  } else {
+    fileIndicator.style.display = "none";
+  }
+  updateModelInfo();
+};
+
+const updateModelInfo = () => {
+  if (loadedFileName) {
+    const fileType = loadedFileName.endsWith('.ifc') ? 'IFC Model' : 'Fragment';
+    const fragmentCount = fragments.list.size;
+    modelInfo.innerHTML = `
+      <div class="info-row">
+        <span>File:</span>
+        <span class="info-value">${loadedFileName}</span>
+      </div>
+      <div class="info-row">
+        <span>Type:</span>
+        <span class="info-value">${fileType}</span>
+      </div>
+      <div class="info-row">
+        <span>Fragments:</span>
+        <span class="info-value">${fragmentCount}</span>
+      </div>
+    `;
+  } else {
+    modelInfo.innerHTML = '<p style="text-align: center; color: var(--slate-600);">No model loaded</p>';
+  }
+};
+
+const loadFile = async (file: File) => {
+  setLoading(true);
+  updateFileIndicator(file.name);
+
+  try {
+    if (file.name.endsWith('.ifc')) {
+      const arrayBuffer = await file.arrayBuffer();
+      const buffer = new Uint8Array(arrayBuffer);
+      const modelId = file.name.replace('.ifc', '').replace(/[^a-zA-Z0-9]/g, '_');
+      await ifcLoader.load(buffer, false, modelId, {
+        processData: {
+          progressCallback: (progress) => {
+            console.log(`Loading progress: ${(progress * 100).toFixed(2)}%`);
+          },
+        },
+      });
+      console.log("IFC file loaded successfully");
+    } else if (file.name.endsWith('.frag')) {
+      const arrayBuffer = await file.arrayBuffer();
+      const modelId = file.name.replace('.frag', '').replace(/[^a-zA-Z0-9]/g, '_');
+      await fragments.core.load(arrayBuffer, { modelId });
+      console.log("Fragment file loaded successfully");
+    } else {
+      throw new Error("Unsupported file type. Please use .ifc or .frag files.");
+    }
+  } catch (error) {
+    console.error("Failed to load file:", error);
+    alert(`Failed to load file: ${error instanceof Error ? error.message : "Unknown error"}`);
+    updateFileIndicator(null);
+  } finally {
+    setLoading(false);
+    fileInput.value = "";
+  }
+};
+
+// Event Handlers
+loadBtn.addEventListener("click", () => {
+  fileInput.click();
+});
+
+fileInput.addEventListener("change", async (event) => {
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
+  if (file) {
+    await loadFile(file);
+  }
+});
+
+resetCameraBtn.addEventListener("click", () => {
+  world.camera.controls.setLookAt(78, 20, -2.2, 26, -4, 25);
+});
+
+fitToViewBtn.addEventListener("click", async () => {
+  const [model] = fragments.list.values();
+  if (model) {
+    const box = model.box;
+    const sphere = new THREE.Sphere();
+    box.getBoundingSphere(sphere);
+    await world.camera.controls.fitToSphere(sphere, true);
+  } else {
+    world.camera.controls.setLookAt(78, 20, -2.2, 26, -4, 25);
+  }
+});
+
+leftPanelToggle.addEventListener("click", () => {
+  leftPanelOpen = !leftPanelOpen;
+  if (leftPanelOpen) {
+    leftPanel.classList.remove("hidden");
+  } else {
+    leftPanel.classList.add("hidden");
+  }
+});
+
+rightPanelToggle.addEventListener("click", () => {
+  rightPanelOpen = !rightPanelOpen;
+  if (rightPanelOpen) {
+    rightPanel.classList.remove("hidden");
+  } else {
+    rightPanel.classList.add("hidden");
+  }
+});
+
+// Initialize BUI
 BUI.Manager.init();
 
 const componentResult = BUI.Component.create<BUI.PanelSection, {}>(() => {
@@ -84,42 +236,13 @@ const componentResult = BUI.Component.create<BUI.PanelSection, {}>(() => {
     `;
   }
 
-  let loadBtn: BUI.TemplateResult | undefined;
-  if (fragments.list.size === 0) {
-    const onUploadIfc = async (event: Event) => {
-      const input = event.target as HTMLInputElement;
-      const file = input.files?.[0];
-      if (!file) return;
-
-      try {
-        const arrayBuffer = await file.arrayBuffer();
-        const buffer = new Uint8Array(arrayBuffer);
-        await ifcLoader.load(buffer, false, file.name, {
-          processData: {
-            progressCallback: (progress) => console.log(progress),
-          },
-        });
-      } catch (error) {
-        console.error("Failed to load IFC:", error);
-        alert(`Failed to load IFC file: ${error instanceof Error ? error.message : "Unknown error"}`);
-      } finally {
-        // Reset input
-        input.value = "";
-      }
-    };
-
-    loadBtn = BUI.html`
-      <bim-label>Upload IFC File:</bim-label>
-      <input type="file" accept=".ifc" @change=${onUploadIfc} style="margin-top: 0.5rem; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; width: 100%;" />
-      <bim-label>Open the console to see the progress!</bim-label>
-    `;
-  }
-
   return BUI.html`
-    <bim-panel active label="HedralLoader Tutorial" class="options-menu">
-      <bim-panel-section label="Controls">
-        ${loadBtn}
+    <bim-panel active label="HedralLoader Controls" class="options-menu">
+      <bim-panel-section label="File Operations">
         ${downloadBtn}
+        <bim-label style="margin-top: 1rem; color: var(--slate-500); font-size: 0.75rem;">
+          Open the console to see loading progress!
+        </bim-label>
       </bim-panel-section>
     </bim-panel>
   `;
@@ -129,29 +252,15 @@ const componentResult = BUI.Component.create<BUI.PanelSection, {}>(() => {
 const panel = Array.isArray(componentResult) ? componentResult[0] : componentResult;
 const updatePanel = Array.isArray(componentResult) ? componentResult[1] : () => {};
 
-document.body.append(panel);
+leftPanelContent.append(panel);
 fragments.list.onItemSet.add(() => {
   if (typeof updatePanel === 'function') {
     updatePanel();
   }
+  updateModelInfo();
 });
 
-const button = BUI.Component.create<BUI.PanelSection>(() => {
-  return BUI.html`
-      <bim-button class="phone-menu-toggler" icon="solar:settings-bold"
-        @click="${() => {
-          if (panel.classList.contains("options-menu-visible")) {
-            panel.classList.remove("options-menu-visible");
-          } else {
-            panel.classList.add("options-menu-visible");
-          }
-        }}">
-      </bim-button>
-    `;
-});
-
-document.body.append(button);
-
+// Stats.js setup
 const stats = new Stats();
 stats.showPanel(2);
 document.body.append(stats.dom);
@@ -159,4 +268,20 @@ stats.dom.style.left = "0px";
 stats.dom.style.zIndex = "unset";
 world.renderer.onBeforeUpdate.add(() => stats.begin());
 world.renderer.onAfterUpdate.add(() => stats.end());
+
+// Update FPS display using renderer frame updates
+let frameCount = 0;
+let lastUpdateTime = performance.now();
+const updateFPS = () => {
+  frameCount++;
+  const now = performance.now();
+  const elapsed = now - lastUpdateTime;
+  if (elapsed >= 1000) {
+    const fps = Math.round((frameCount * 1000) / elapsed);
+    fpsStat.textContent = `${fps} FPS`;
+    frameCount = 0;
+    lastUpdateTime = now;
+  }
+};
+world.renderer.onAfterUpdate.add(updateFPS);
 

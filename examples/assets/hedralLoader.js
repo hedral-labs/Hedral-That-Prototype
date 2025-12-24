@@ -16,3 +16,4 @@ var v=Object.defineProperty;var C=(t,s,e)=>s in t?v(t,s,{enumerable:!0,configura
       </bim-button>
     `);document.body.append(N);const m=new W;m.showPanel(2);document.body.append(m.dom);m.dom.style.left="0px";m.dom.style.zIndex="unset";c.renderer.onBeforeUpdate.add(()=>m.begin());c.renderer.onAfterUpdate.add(()=>m.end());
 
+

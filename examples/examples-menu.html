@@ -1,0 +1,656 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/x-icon" href="https://thatopen.github.io/engine_components/resources/favicon.ico">
+  <title>Examples Menu | Engine Components</title>
+  <style>
+    @import url('https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=satoshi@400,500,700&display=swap');
+
+    :root {
+      --primary-glow: rgba(45, 212, 191, 0.3);
+      --cyber-400: #2dd4bf;
+      --cyber-500: #14b8a6;
+      --cyber-600: #0d9488;
+      --void-900: #0a0a0f;
+      --void-800: #14141f;
+      --slate-300: #cbd5e1;
+      --slate-400: #94a3b8;
+      --slate-500: #64748b;
+      --slate-600: #475569;
+      --slate-800: #1e293b;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Satoshi', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background: var(--void-900);
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+
+    .cyber-grid {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(45, 212, 191, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(45, 212, 191, 0.03) 1px, transparent 1px);
+      background-size: 50px 50px;
+      animation: grid-flow 20s linear infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes grid-flow {
+      0% { transform: translateX(0) translateY(0); }
+      100% { transform: translateX(50px) translateY(50px); }
+    }
+
+    .header {
+      position: relative;
+      z-index: 10;
+      background: linear-gradient(to bottom, var(--void-900), rgba(10, 10, 15, 0.95));
+      padding: 2rem 3rem;
+      border-bottom: 1px solid rgba(45, 212, 191, 0.2);
+    }
+
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo-icon {
+      padding: 0.5rem;
+      background: linear-gradient(135deg, rgba(45, 212, 191, 0.2), rgba(13, 148, 136, 0.2));
+      border-radius: 0.5rem;
+      border: 1px solid rgba(45, 212, 191, 0.3);
+    }
+
+    .logo-icon svg {
+      width: 1.5rem;
+      height: 1.5rem;
+      color: var(--cyber-400);
+    }
+
+    .logo-text h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--cyber-400);
+      text-shadow: 
+        0 0 10px var(--primary-glow),
+        0 0 20px var(--primary-glow),
+        0 0 30px var(--primary-glow);
+      font-family: 'Clash Display', system-ui, sans-serif;
+    }
+
+    .logo-text p {
+      font-size: 0.875rem;
+      color: var(--slate-500);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .btn-back {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: linear-gradient(135deg, rgba(13, 148, 136, 0.2), rgba(15, 118, 110, 0.2));
+      border: 1px solid rgba(45, 212, 191, 0.3);
+      border-radius: 0.5rem;
+      color: var(--slate-300);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+    }
+
+    .btn-back:hover {
+      border-color: rgba(45, 212, 191, 0.5);
+      box-shadow: 0 0 20px rgba(45, 212, 191, 0.2);
+    }
+
+    .btn-back svg {
+      width: 1rem;
+      height: 1rem;
+      color: var(--cyber-400);
+    }
+
+    .container {
+      position: relative;
+      z-index: 10;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 3rem;
+    }
+
+    .page-title {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .page-title h2 {
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--cyber-400);
+      text-shadow: 
+        0 0 10px var(--primary-glow),
+        0 0 20px var(--primary-glow);
+      font-family: 'Clash Display', system-ui, sans-serif;
+      margin-bottom: 0.5rem;
+    }
+
+    .page-title p {
+      font-size: 1rem;
+      color: var(--slate-500);
+    }
+
+    .examples-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .example-card {
+      background: linear-gradient(135deg, rgba(20, 184, 166, 0.1), rgba(15, 118, 110, 0.05));
+      border: 1px solid rgba(45, 212, 191, 0.2);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+
+    .example-card:hover {
+      border-color: rgba(45, 212, 191, 0.5);
+      box-shadow: 
+        0 0 20px rgba(45, 212, 191, 0.2),
+        inset 0 0 20px rgba(45, 212, 191, 0.05);
+      transform: translateY(-4px);
+    }
+
+    .example-card h3 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--slate-300);
+      margin-bottom: 0.5rem;
+      font-family: 'Clash Display', system-ui, sans-serif;
+    }
+
+    .example-card p {
+      font-size: 0.875rem;
+      color: var(--slate-500);
+      line-height: 1.5;
+    }
+
+    .example-card .card-footer {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(45, 212, 191, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .example-card .card-footer span {
+      font-size: 0.75rem;
+      color: var(--cyber-400);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .example-card .card-footer svg {
+      width: 0.875rem;
+      height: 0.875rem;
+      color: var(--cyber-400);
+    }
+
+    .hedral-link {
+      margin-bottom: 3rem;
+      text-align: center;
+    }
+
+    .hedral-link-card {
+      display: inline-block;
+      background: linear-gradient(135deg, rgba(45, 212, 191, 0.15), rgba(13, 148, 136, 0.1));
+      border: 2px solid rgba(45, 212, 191, 0.4);
+      border-radius: 1rem;
+      padding: 2rem 3rem;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 
+        0 0 30px rgba(45, 212, 191, 0.2),
+        inset 0 0 30px rgba(45, 212, 191, 0.05);
+    }
+
+    .hedral-link-card:hover {
+      border-color: rgba(45, 212, 191, 0.7);
+      box-shadow: 
+        0 0 40px rgba(45, 212, 191, 0.4),
+        inset 0 0 40px rgba(45, 212, 191, 0.1);
+      transform: translateY(-4px);
+    }
+
+    .hedral-link-card h2 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--cyber-400);
+      margin-bottom: 0.5rem;
+      font-family: 'Clash Display', system-ui, sans-serif;
+      text-shadow: 
+        0 0 10px var(--primary-glow),
+        0 0 20px var(--primary-glow);
+    }
+
+    .hedral-link-card p {
+      font-size: 1rem;
+      color: var(--slate-400);
+      margin-bottom: 1rem;
+    }
+
+    .hedral-link-card .link-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: rgba(45, 212, 191, 0.2);
+      border: 1px solid rgba(45, 212, 191, 0.4);
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--cyber-400);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .hedral-link-card .link-badge svg {
+      width: 1rem;
+      height: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        padding: 1.5rem;
+      }
+
+      .container {
+        padding: 2rem 1.5rem;
+      }
+
+      .examples-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="cyber-grid"></div>
+  
+  <header class="header">
+    <div class="header-content">
+      <div class="header-left">
+        <div class="header-logo">
+          <div class="logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <path d="M9 9h6v6H9z"/>
+            </svg>
+          </div>
+          <div class="logo-text">
+            <h1>Engine Components</h1>
+            <p>Examples Gallery</p>
+          </div>
+        </div>
+      </div>
+      <a href="HedralLoader/index.html" class="btn-back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+        <span>Back to Viewer</span>
+      </a>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="hedral-link">
+      <a href="HedralLoader/index.html" class="hedral-link-card">
+        <h2>🚀 HedralLoader</h2>
+        <p>Main BIM Viewer - Load and view IFC and Fragment files</p>
+        <div class="link-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+          <span>Open Viewer</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="page-title">
+      <h2>Component Examples</h2>
+      <p>Explore all available engine component examples</p>
+    </div>
+
+    <div class="examples-grid">
+      <a href="AreaMeasurement/index.html" class="example-card">
+        <h3>Area Measurement</h3>
+        <p>Measure areas in 3D models with interactive tools</p>
+        <div class="card-footer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+          <span>View Example</span>
+        </div>
+      </a>
+
+      <a href="BCFTopics/index.html" class="example-card">
+        <h3>BCF Topics</h3>
+        <p>BIM Collaboration Format topics management</p>
+        <div class="card-footer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+          <span>View Example</span>
+        </div>
+      </a>
+
+      <a href="BoundingBoxer/index.html" class="example-card">
+        <h3>Bounding Boxer</h3>
+        <p>Visualize object bounding boxes in 3D space</p>
+        <div class="card-footer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+          <span>View Example</span>
+        </div>
+      </a>
+
+      <a href="CivilNavigators/index.html" class="example-card">
+        <h3>Civil Navigators</h3>
+        <p>Navigation tools for civil engineering models</p>
+        <div class="card-footer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+          <span>View Example</span>
+        </div>
+      </a>
+
+      <a href="Classifier/index.html" class="example-card">
+        <h3>Classifier</h3>
+        <p>Classify and categorize model elements</p>
+        <div class="card-footer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+          <span>View Example</span>
+        </div>
+      </a>
+
+      <a href="Clipper/index.html" class="example-card">
+        <h3>Clipper</h3>
+        <p>Create section cuts and clipping planes</p>
+        <div class="card-footer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+          <span>View Example</span>
+        </div>
+      </a>
+
+      <a href="ClipStyler/index.html" class="example-card">
+        <h3>Clip Styler</h3>
+        <p>Style and customize clipping visualizations</p>
+        <div class="card-footer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+          <span>View Example</span>
+        </div>
+      </a>
+
+      <a href="FragmentsManager/index.html" class="example-card">
+        <h3>Fragments Manager</h3>
+        <p>Manage and manipulate 3D model fragments</p>
+        <div class="card-footer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+          <span>View Example</span>
+        </div>
+      </a>
+
+      <a href="Grids/index.html" class="example-card">
+        <h3>Grids</h3>
+        <p>Display and manage grid systems</p>
+        <div class="card-footer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+          <span>View Example</span>
+        </div>
+      </a>
+
+      <a href="Hider/index.html" class="example-card">
+        <h3>Hider</h3>
+        <p>Show and hide model elements dynamically</p>
+        <div class="card-footer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+          <span>View Example</span>
+        </div>
+      </a>
+
+      <a href="Highlighter/index.html" class="example-card">
+        <h3>Highlighter</h3>
+        <p>Highlight selected elements in the model</p>
+        <div class="card-footer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+          <span>View Example</span>
+        </div>
+      </a>
+
+      <a href="Hoverer/index.html" class="example-card">
+        <h3>Hoverer</h3>
+        <p>Interactive hover effects for model elements</p>
+        <div class="card-footer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+          <span>View Example</span>
+        </div>
+      </a>
+
+      <a href="IDSSpecifications/index.html" class="example-card">
+        <h3>IDS Specifications</h3>
+        <p>Information Delivery Specification management</p>
+        <div class="card-footer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+          <span>View Example</span>
+        </div>
+      </a>
+
+      <a href="IfcLoader/index.html" class="example-card">
+        <h3>IFC Loader</h3>
+        <p>Load and process IFC model files</p>
+        <div class="card-footer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+          <span>View Example</span>
+        </div>
+      </a>
+
+      <a href="ItemsFinder/index.html" class="example-card">
+        <h3>Items Finder</h3>
+        <p>Search and find items in the model</p>
+        <div class="card-footer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+          <span>View Example</span>
+        </div>
+      </a>
+
+      <a href="LengthMeasurement/index.html" class="example-card">
+        <h3>Length Measurement</h3>
+        <p>Measure distances and lengths in 3D</p>
+        <div class="card-footer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+          <span>View Example</span>
+        </div>
+      </a>
+
+      <a href="Marker/index.html" class="example-card">
+        <h3>Marker</h3>
+        <p>Place and manage markers in 3D space</p>
+        <div class="card-footer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+          <span>View Example</span>
+        </div>
+      </a>
+
+      <a href="OrthoPerspectiveCamera/index.html" class="example-card">
+        <h3>Ortho Perspective Camera</h3>
+        <p>Switch between orthographic and perspective views</p>
+        <div class="card-footer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+          <span>View Example</span>
+        </div>
+      </a>
+
+      <a href="Outliner/index.html" class="example-card">
+        <h3>Outliner</h3>
+        <p>Outline selected objects with visual effects</p>
+        <div class="card-footer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+          <span>View Example</span>
+        </div>
+      </a>
+
+      <a href="PostproductionRenderer/index.html" class="example-card">
+        <h3>Post Production Renderer</h3>
+        <p>Advanced rendering and post-processing effects</p>
+        <div class="card-footer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+          <span>View Example</span>
+        </div>
+      </a>
+
+      <a href="Raycasters/index.html" class="example-card">
+        <h3>Raycasters</h3>
+        <p>Raycasting and intersection detection tools</p>
+        <div class="card-footer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+          <span>View Example</span>
+        </div>
+      </a>
+
+      <a href="ShadowedScene/index.html" class="example-card">
+        <h3>Shadowed Scene</h3>
+        <p>Realistic shadows and lighting effects</p>
+        <div class="card-footer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+          <span>View Example</span>
+        </div>
+      </a>
+
+      <a href="Viewpoints/index.html" class="example-card">
+        <h3>Viewpoints</h3>
+        <p>Save and restore camera viewpoints</p>
+        <div class="card-footer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+          <span>View Example</span>
+        </div>
+      </a>
+
+      <a href="Views/index.html" class="example-card">
+        <h3>Views</h3>
+        <p>Manage multiple view configurations</p>
+        <div class="card-footer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+          <span>View Example</span>
+        </div>
+      </a>
+
+      <a href="VolumeMeasurement/index.html" class="example-card">
+        <h3>Volume Measurement</h3>
+        <p>Calculate and measure volumes in 3D models</p>
+        <div class="card-footer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+          <span>View Example</span>
+        </div>
+      </a>
+
+      <a href="Worlds/index.html" class="example-card">
+        <h3>Worlds</h3>
+        <p>Manage multiple 3D worlds and scenes</p>
+        <div class="card-footer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+          <span>View Example</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</body>
+</html>
+
