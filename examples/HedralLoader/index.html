@@ -643,57 +643,57 @@
         letter-spacing: 0.05em;
       }
 
-      .theme-options {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
+      .theme-select-wrapper {
+        position: relative;
+        width: 100%;
       }
 
-      .theme-option {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
+      .theme-select {
+        width: 100%;
         padding: 0.75rem;
         background: var(--info-card-bg);
         border: 1px solid var(--border-color);
         border-radius: 0.5rem;
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        font-weight: 500;
         cursor: pointer;
         transition: all 0.2s;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        padding-right: 2.5rem;
       }
 
-      .theme-option:hover {
+      .theme-select-wrapper::after {
+        content: '';
+        position: absolute;
+        right: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 0;
+        height: 0;
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-top: 6px solid var(--accent-color);
+        pointer-events: none;
+      }
+
+      .theme-select:hover {
         border-color: var(--accent-hover);
-        background: var(--accent-glow);
+        background-color: var(--accent-glow);
       }
 
-      .theme-option.active {
+      .theme-select:focus {
+        outline: none;
         border-color: var(--accent-color);
-        background: var(--btn-bg);
         box-shadow: 0 0 10px var(--primary-glow);
       }
 
-      .theme-option input[type="radio"] {
-        margin: 0;
-        cursor: pointer;
-      }
-
-      .theme-option label {
-        flex: 1;
-        margin: 0;
-        cursor: pointer;
-        font-size: 0.875rem;
-        font-weight: 500;
+      .theme-select option {
+        background: var(--bg-panel);
         color: var(--text-secondary);
-        text-transform: none;
-        letter-spacing: normal;
-      }
-
-      .theme-option .theme-preview {
-        width: 20px;
-        height: 20px;
-        border-radius: 4px;
-        border: 1px solid var(--border-color);
-        flex-shrink: 0;
+        padding: 0.5rem;
       }
 
       /* BUI Panel overrides */
@@ -830,23 +830,13 @@
     <div class="panel-content" id="leftPanelContent">
       <!-- Theme Selector -->
       <div class="theme-selector">
-        <label>Theme</label>
-        <div class="theme-options">
-          <div class="theme-option active" data-theme="cyberpunk">
-            <input type="radio" name="theme" id="theme-cyberpunk" value="cyberpunk" checked>
-            <label for="theme-cyberpunk">Cyberpunk</label>
-            <div class="theme-preview" style="background: linear-gradient(135deg, #0a0a0f, #2dd4bf);"></div>
-          </div>
-          <div class="theme-option" data-theme="cad">
-            <input type="radio" name="theme" id="theme-cad" value="cad">
-            <label for="theme-cad">White CAD</label>
-            <div class="theme-preview" style="background: linear-gradient(135deg, #ffffff, #3b82f6);"></div>
-          </div>
-          <div class="theme-option" data-theme="gray">
-            <input type="radio" name="theme" id="theme-gray" value="gray">
-            <label for="theme-gray">Desktop Gray</label>
-            <div class="theme-preview" style="background: linear-gradient(135deg, #1e293b, #94a3b8);"></div>
-          </div>
+        <label for="themeSelect">Theme</label>
+        <div class="theme-select-wrapper">
+          <select id="themeSelect" class="theme-select">
+            <option value="cyberpunk">Cyberpunk</option>
+            <option value="cad">White CAD</option>
+            <option value="gray">Desktop Gray</option>
+          </select>
         </div>
       </div>
       <!-- BUI components will be inserted here -->

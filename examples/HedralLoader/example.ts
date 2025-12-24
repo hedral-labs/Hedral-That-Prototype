@@ -243,40 +243,6 @@ rightPanelToggle.addEventListener("click", () => {
   }
 });
 
-// Initialize BUI
-BUI.Manager.init();
-
-const componentResult = BUI.Component.create<BUI.PanelSection, {}>(() => {
-  let downloadBtn: BUI.TemplateResult | undefined;
-  if (fragments.list.size > 0) {
-    downloadBtn = BUI.html`
-      <bim-button label="Download Fragments" @click=${downloadFragments}></bim-button>
-    `;
-  }
-
-  return BUI.html`
-    <bim-panel active label="HedralLoader Controls" class="options-menu">
-      <bim-panel-section label="File Operations">
-        ${downloadBtn}
-        <bim-label style="margin-top: 1rem; color: var(--slate-500); font-size: 0.75rem;">
-          Open the console to see loading progress!
-        </bim-label>
-      </bim-panel-section>
-    </bim-panel>
-  `;
-}, {});
-
-// Handle both array and single element return types
-const panel = Array.isArray(componentResult) ? componentResult[0] : componentResult;
-const updatePanel = Array.isArray(componentResult) ? componentResult[1] : () => {};
-
-leftPanelContent.append(panel);
-fragments.list.onItemSet.add(() => {
-  if (typeof updatePanel === 'function') {
-    updatePanel();
-  }
-  updateModelInfo();
-});
 
 // Stats.js setup
 const stats = new Stats();
@@ -312,18 +278,11 @@ function setTheme(theme: Theme) {
   document.body.className = document.body.className.replace(/theme-\w+/g, '');
   document.body.classList.add(`theme-${theme}`);
   
-  // Update active state in theme selector
-  const themeOptions = document.querySelectorAll('.theme-option');
-  themeOptions.forEach((option) => {
-    const optionTheme = option.getAttribute('data-theme');
-    if (optionTheme === theme) {
-      option.classList.add('active');
-      const radio = option.querySelector('input[type="radio"]') as HTMLInputElement;
-      if (radio) radio.checked = true;
-    } else {
-      option.classList.remove('active');
-    }
-  });
+  // Update dropdown selection
+  const themeSelect = document.getElementById('themeSelect') as HTMLSelectElement;
+  if (themeSelect) {
+    themeSelect.value = theme;
+  }
   
   // Save to localStorage
   localStorage.setItem(THEME_STORAGE_KEY, theme);
@@ -339,30 +298,12 @@ function initTheme() {
 // Initialize theme on load
 initTheme();
 
-// Add event listeners for theme selection
-const themeInputs = document.querySelectorAll('input[name="theme"]');
-themeInputs.forEach((input) => {
-  input.addEventListener('change', (e) => {
-    const target = e.target as HTMLInputElement;
-    if (target.checked) {
-      setTheme(target.value as Theme);
-    }
+// Add event listener for theme dropdown
+const themeSelect = document.getElementById('themeSelect') as HTMLSelectElement;
+if (themeSelect) {
+  themeSelect.addEventListener('change', (e) => {
+    const target = e.target as HTMLSelectElement;
+    setTheme(target.value as Theme);
   });
-});
-
-// Also handle clicks on theme option containers
-const themeOptions = document.querySelectorAll('.theme-option');
-themeOptions.forEach((option) => {
-  option.addEventListener('click', (e) => {
-    const target = e.target as HTMLElement;
-    // Don't trigger if clicking the radio input directly
-    if (target.tagName !== 'INPUT') {
-      const radio = option.querySelector('input[type="radio"]') as HTMLInputElement;
-      if (radio) {
-        radio.checked = true;
-        setTheme(radio.value as Theme);
-      }
-    }
-  });
-});
+}
 
