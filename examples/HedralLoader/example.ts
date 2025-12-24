@@ -19,6 +19,7 @@ const fileIndicator = document.getElementById("fileIndicator") as HTMLDivElement
 const fileName = document.getElementById("fileName") as HTMLSpanElement;
 const modelInfo = document.getElementById("modelInfo") as HTMLDivElement;
 const fpsStat = document.getElementById("fpsStat") as HTMLSpanElement;
+const clearBtn = document.getElementById("clearBtn") as HTMLButtonElement;
 
 let isLoading = false;
 let loadedFileName: string | null = null;
@@ -95,6 +96,15 @@ const downloadFragments = async () => {
   link.download = file.name;
   link.click();
   URL.revokeObjectURL(link.href);
+};
+
+const clearAllModels = () => {
+  const modelIds = [...fragments.list.keys()];
+  for (const modelId of modelIds) {
+    fragments.core.disposeModel(modelId);
+  }
+  updateFileIndicator(null);
+  fragments.core.update(true);
 };
 
 // UI Functions
@@ -181,6 +191,14 @@ const loadFile = async (file: File) => {
 // Event Handlers
 loadBtn.addEventListener("click", () => {
   fileInput.click();
+});
+
+clearBtn.addEventListener("click", () => {
+  if (fragments.list.size > 0) {
+    if (confirm("Are you sure you want to clear all loaded models?")) {
+      clearAllModels();
+    }
+  }
 });
 
 fileInput.addEventListener("change", async (event) => {
@@ -284,4 +302,67 @@ const updateFPS = () => {
   }
 };
 world.renderer.onAfterUpdate.add(updateFPS);
+
+// Theme Management
+type Theme = 'cyberpunk' | 'cad' | 'gray';
+
+const THEME_STORAGE_KEY = 'hedralLoader-theme';
+
+function setTheme(theme: Theme) {
+  document.body.className = document.body.className.replace(/theme-\w+/g, '');
+  document.body.classList.add(`theme-${theme}`);
+  
+  // Update active state in theme selector
+  const themeOptions = document.querySelectorAll('.theme-option');
+  themeOptions.forEach((option) => {
+    const optionTheme = option.getAttribute('data-theme');
+    if (optionTheme === theme) {
+      option.classList.add('active');
+      const radio = option.querySelector('input[type="radio"]') as HTMLInputElement;
+      if (radio) radio.checked = true;
+    } else {
+      option.classList.remove('active');
+    }
+  });
+  
+  // Save to localStorage
+  localStorage.setItem(THEME_STORAGE_KEY, theme);
+}
+
+function initTheme() {
+  // Load saved theme or default to cyberpunk
+  const savedTheme = localStorage.getItem(THEME_STORAGE_KEY) as Theme | null;
+  const theme = savedTheme || 'cyberpunk';
+  setTheme(theme);
+}
+
+// Initialize theme on load
+initTheme();
+
+// Add event listeners for theme selection
+const themeInputs = document.querySelectorAll('input[name="theme"]');
+themeInputs.forEach((input) => {
+  input.addEventListener('change', (e) => {
+    const target = e.target as HTMLInputElement;
+    if (target.checked) {
+      setTheme(target.value as Theme);
+    }
+  });
+});
+
+// Also handle clicks on theme option containers
+const themeOptions = document.querySelectorAll('.theme-option');
+themeOptions.forEach((option) => {
+  option.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    // Don't trigger if clicking the radio input directly
+    if (target.tagName !== 'INPUT') {
+      const radio = option.querySelector('input[type="radio"]') as HTMLInputElement;
+      if (radio) {
+        radio.checked = true;
+        setTheme(radio.value as Theme);
+      }
+    }
+  });
+});
 

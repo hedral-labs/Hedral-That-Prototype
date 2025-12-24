@@ -17,6 +17,7 @@
       @import url('https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=satoshi@400,500,700&display=swap');
 
       :root {
+        /* Theme variables - will be overridden by theme classes */
         --primary-glow: rgba(45, 212, 191, 0.3);
         --secondary-glow: rgba(148, 163, 184, 0.3);
         --accent-glow: rgba(251, 146, 60, 0.4);
@@ -30,6 +31,117 @@
         --slate-500: #64748b;
         --slate-600: #475569;
         --slate-800: #1e293b;
+        --bg-primary: #0a0a0f;
+        --bg-secondary: #14141f;
+        --bg-panel: rgba(20, 20, 31, 0.9);
+        --text-primary: #e2e8f0;
+        --text-secondary: #cbd5e1;
+        --text-muted: #64748b;
+        --border-color: rgba(45, 212, 191, 0.2);
+        --accent-color: #2dd4bf;
+        --accent-hover: rgba(45, 212, 191, 0.5);
+        --grid-color: rgba(45, 212, 191, 0.03);
+        --panel-bg: linear-gradient(to bottom, rgba(20, 20, 31, 0.9), rgba(10, 10, 15, 0.9));
+        --header-bg: linear-gradient(to bottom, var(--bg-primary), rgba(10, 10, 15, 0.95), transparent);
+        --btn-bg: linear-gradient(135deg, rgba(13, 148, 136, 0.2), rgba(15, 118, 110, 0.2));
+        --info-card-bg: linear-gradient(135deg, rgba(20, 184, 166, 0.1), rgba(15, 118, 110, 0.05));
+        --loading-overlay: rgba(10, 10, 15, 0.8);
+      }
+
+      /* Cyberpunk Theme (Default) */
+      body.theme-cyberpunk {
+        --primary-glow: rgba(45, 212, 191, 0.3);
+        --secondary-glow: rgba(148, 163, 184, 0.3);
+        --accent-glow: rgba(251, 146, 60, 0.4);
+        --cyber-400: #2dd4bf;
+        --cyber-500: #14b8a6;
+        --cyber-600: #0d9488;
+        --void-900: #0a0a0f;
+        --void-800: #14141f;
+        --slate-300: #cbd5e1;
+        --slate-400: #94a3b8;
+        --slate-500: #64748b;
+        --slate-600: #475569;
+        --slate-800: #1e293b;
+        --bg-primary: #0a0a0f;
+        --bg-secondary: #14141f;
+        --bg-panel: rgba(20, 20, 31, 0.9);
+        --text-primary: #e2e8f0;
+        --text-secondary: #cbd5e1;
+        --text-muted: #64748b;
+        --border-color: rgba(45, 212, 191, 0.2);
+        --accent-color: #2dd4bf;
+        --accent-hover: rgba(45, 212, 191, 0.5);
+        --grid-color: rgba(45, 212, 191, 0.03);
+        --panel-bg: linear-gradient(to bottom, rgba(20, 20, 31, 0.9), rgba(10, 10, 15, 0.9));
+        --header-bg: linear-gradient(to bottom, var(--bg-primary), rgba(10, 10, 15, 0.95), transparent);
+        --btn-bg: linear-gradient(135deg, rgba(13, 148, 136, 0.2), rgba(15, 118, 110, 0.2));
+        --info-card-bg: linear-gradient(135deg, rgba(20, 184, 166, 0.1), rgba(15, 118, 110, 0.05));
+        --loading-overlay: rgba(10, 10, 15, 0.8);
+      }
+
+      /* White CAD Theme */
+      body.theme-cad {
+        --primary-glow: rgba(59, 130, 246, 0.2);
+        --secondary-glow: rgba(148, 163, 184, 0.1);
+        --accent-glow: rgba(59, 130, 246, 0.3);
+        --cyber-400: #3b82f6;
+        --cyber-500: #2563eb;
+        --cyber-600: #1d4ed8;
+        --void-900: #ffffff;
+        --void-800: #f8fafc;
+        --slate-300: #1e293b;
+        --slate-400: #475569;
+        --slate-500: #64748b;
+        --slate-600: #94a3b8;
+        --slate-800: #e2e8f0;
+        --bg-primary: #ffffff;
+        --bg-secondary: #f8fafc;
+        --bg-panel: rgba(248, 250, 252, 0.95);
+        --text-primary: #1e293b;
+        --text-secondary: #334155;
+        --text-muted: #64748b;
+        --border-color: rgba(59, 130, 246, 0.2);
+        --accent-color: #3b82f6;
+        --accent-hover: rgba(59, 130, 246, 0.4);
+        --grid-color: rgba(59, 130, 246, 0.05);
+        --panel-bg: linear-gradient(to bottom, rgba(248, 250, 252, 0.95), rgba(255, 255, 255, 0.95));
+        --header-bg: linear-gradient(to bottom, var(--bg-primary), rgba(255, 255, 255, 0.95), transparent);
+        --btn-bg: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.1));
+        --info-card-bg: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(37, 99, 235, 0.03));
+        --loading-overlay: rgba(255, 255, 255, 0.9);
+      }
+
+      /* Desktop Gray Theme */
+      body.theme-gray {
+        --primary-glow: rgba(148, 163, 184, 0.2);
+        --secondary-glow: rgba(148, 163, 184, 0.1);
+        --accent-glow: rgba(148, 163, 184, 0.3);
+        --cyber-400: #94a3b8;
+        --cyber-500: #64748b;
+        --cyber-600: #475569;
+        --void-900: #1e293b;
+        --void-800: #334155;
+        --slate-300: #e2e8f0;
+        --slate-400: #cbd5e1;
+        --slate-500: #94a3b8;
+        --slate-600: #64748b;
+        --slate-800: #475569;
+        --bg-primary: #1e293b;
+        --bg-secondary: #334155;
+        --bg-panel: rgba(51, 65, 85, 0.95);
+        --text-primary: #e2e8f0;
+        --text-secondary: #cbd5e1;
+        --text-muted: #94a3b8;
+        --border-color: rgba(148, 163, 184, 0.2);
+        --accent-color: #94a3b8;
+        --accent-hover: rgba(148, 163, 184, 0.4);
+        --grid-color: rgba(148, 163, 184, 0.05);
+        --panel-bg: linear-gradient(to bottom, rgba(51, 65, 85, 0.95), rgba(30, 41, 59, 0.95));
+        --header-bg: linear-gradient(to bottom, var(--bg-primary), rgba(30, 41, 59, 0.95), transparent);
+        --btn-bg: linear-gradient(135deg, rgba(100, 116, 139, 0.2), rgba(71, 85, 105, 0.2));
+        --info-card-bg: linear-gradient(135deg, rgba(100, 116, 139, 0.1), rgba(71, 85, 105, 0.05));
+        --loading-overlay: rgba(30, 41, 59, 0.9);
       }
 
       * {
@@ -44,9 +156,10 @@
         font-family: 'Satoshi', system-ui, -apple-system, sans-serif;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
-        background: var(--void-900);
-        color: #e2e8f0;
+        background: var(--bg-primary);
+        color: var(--text-primary);
         overflow: hidden;
+        transition: background-color 0.3s ease, color 0.3s ease;
       }
 
       .full-screen {
@@ -64,12 +177,17 @@
         width: 100%;
         height: 100%;
         background-image: 
-          linear-gradient(rgba(45, 212, 191, 0.03) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(45, 212, 191, 0.03) 1px, transparent 1px);
+          linear-gradient(var(--grid-color) 1px, transparent 1px),
+          linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
         background-size: 50px 50px;
         animation: grid-flow 20s linear infinite;
         pointer-events: none;
         z-index: 0;
+        transition: background-image 0.3s ease;
+      }
+
+      body.theme-cad .cyber-grid {
+        animation: none;
       }
 
       @keyframes grid-flow {
@@ -84,8 +202,9 @@
         left: 0;
         right: 0;
         z-index: 50;
-        background: linear-gradient(to bottom, var(--void-900), rgba(10, 10, 15, 0.95), transparent);
+        background: var(--header-bg);
         padding: 1rem 1.5rem;
+        transition: background 0.3s ease;
       }
 
       .header-content {
@@ -108,32 +227,36 @@
 
       .logo-icon {
         padding: 0.5rem;
-        background: linear-gradient(135deg, rgba(45, 212, 191, 0.2), rgba(13, 148, 136, 0.2));
+        background: var(--btn-bg);
         border-radius: 0.5rem;
-        border: 1px solid rgba(45, 212, 191, 0.3);
+        border: 1px solid var(--border-color);
+        transition: background 0.3s ease, border-color 0.3s ease;
       }
 
       .logo-icon svg {
         width: 1.5rem;
         height: 1.5rem;
-        color: var(--cyber-400);
+        color: var(--accent-color);
+        transition: color 0.3s ease;
       }
 
       .logo-text h1 {
         font-size: 1.25rem;
         font-weight: 600;
-        color: var(--cyber-400);
+        color: var(--accent-color);
         text-shadow: 
           0 0 10px var(--primary-glow),
           0 0 20px var(--primary-glow),
           0 0 30px var(--primary-glow);
         font-family: 'Clash Display', system-ui, sans-serif;
+        transition: color 0.3s ease, text-shadow 0.3s ease;
       }
 
       .logo-text p {
         font-size: 0.75rem;
-        color: var(--slate-500);
+        color: var(--text-muted);
         font-family: 'JetBrains Mono', monospace;
+        transition: color 0.3s ease;
       }
 
       .header-right {
@@ -147,10 +270,10 @@
         align-items: center;
         gap: 0.5rem;
         padding: 0.5rem 1rem;
-        background: linear-gradient(135deg, rgba(13, 148, 136, 0.2), rgba(15, 118, 110, 0.2));
-        border: 1px solid rgba(45, 212, 191, 0.3);
+        background: var(--btn-bg);
+        border: 1px solid var(--border-color);
         border-radius: 0.5rem;
-        color: var(--slate-300);
+        color: var(--text-secondary);
         font-size: 0.875rem;
         font-weight: 500;
         cursor: pointer;
@@ -158,14 +281,14 @@
       }
 
       .btn-primary:hover {
-        border-color: rgba(45, 212, 191, 0.5);
-        box-shadow: 0 0 20px rgba(45, 212, 191, 0.2);
+        border-color: var(--accent-hover);
+        box-shadow: 0 0 20px var(--primary-glow);
       }
 
       .btn-primary svg {
         width: 1rem;
         height: 1rem;
-        color: var(--cyber-400);
+        color: var(--accent-color);
       }
 
       .btn-primary:disabled {
@@ -178,9 +301,10 @@
         align-items: center;
         gap: 0.5rem;
         padding: 0.25rem;
-        background: rgba(20, 20, 31, 0.5);
+        background: var(--bg-panel);
         border-radius: 0.5rem;
-        border: 1px solid var(--slate-800);
+        border: 1px solid var(--border-color);
+        transition: background 0.3s ease, border-color 0.3s ease;
       }
 
       .btn-icon {
@@ -188,13 +312,14 @@
         background: transparent;
         border: none;
         border-radius: 0.25rem;
-        color: var(--slate-400);
+        color: var(--text-muted);
         cursor: pointer;
         transition: all 0.2s;
       }
 
       .btn-icon:hover {
-        background: rgba(45, 212, 191, 0.2);
+        background: var(--accent-hover);
+        opacity: 0.8;
       }
 
       .btn-icon svg {
@@ -207,9 +332,10 @@
         align-items: center;
         gap: 0.75rem;
         padding: 0.5rem 0.75rem;
-        background: rgba(20, 20, 31, 0.5);
+        background: var(--bg-panel);
         border-radius: 0.5rem;
-        border: 1px solid var(--slate-800);
+        border: 1px solid var(--border-color);
+        transition: background 0.3s ease, border-color 0.3s ease;
       }
 
       .stat-item {
@@ -221,13 +347,13 @@
       .stat-item svg {
         width: 0.75rem;
         height: 0.75rem;
-        color: var(--cyber-400);
+        color: var(--accent-color);
       }
 
       .stat-value {
         font-size: 0.75rem;
         font-family: 'JetBrains Mono', monospace;
-        color: var(--slate-400);
+        color: var(--text-muted);
       }
 
       .file-indicator {
@@ -239,15 +365,16 @@
         align-items: center;
         gap: 0.5rem;
         padding: 0.25rem 0.75rem;
-        background: rgba(13, 148, 136, 0.1);
-        border: 1px solid rgba(45, 212, 191, 0.2);
+        background: var(--info-card-bg);
+        border: 1px solid var(--border-color);
         border-radius: 9999px;
+        transition: background 0.3s ease, border-color 0.3s ease;
       }
 
       .status-active {
         width: 8px;
         height: 8px;
-        background: var(--cyber-400);
+        background: var(--accent-color);
         border-radius: 50%;
         animation: pulse 2s infinite;
       }
@@ -266,7 +393,7 @@
       .file-badge span {
         font-size: 0.75rem;
         font-family: 'JetBrains Mono', monospace;
-        color: var(--cyber-400);
+        color: var(--accent-color);
       }
 
       /* Left Panel */
@@ -277,10 +404,10 @@
         bottom: 0;
         z-index: 40;
         width: 20rem;
-        background: linear-gradient(to bottom, rgba(20, 20, 31, 0.9), rgba(10, 10, 15, 0.9));
+        background: var(--panel-bg);
         backdrop-filter: blur(12px);
-        border-right: 1px solid rgba(45, 212, 191, 0.2);
-        transition: transform 0.3s;
+        border-right: 1px solid var(--border-color);
+        transition: transform 0.3s, background 0.3s ease, border-color 0.3s ease;
         animation: slideInLeft 0.3s;
       }
 
@@ -301,16 +428,18 @@
 
       .panel-header {
         padding: 1rem;
-        border-bottom: 1px solid rgba(45, 212, 191, 0.2);
+        border-bottom: 1px solid var(--border-color);
+        transition: border-color 0.3s ease;
       }
 
       .panel-title {
         font-size: 0.875rem;
         font-weight: 600;
-        color: #67e8f9;
+        color: var(--accent-color);
         text-transform: uppercase;
         letter-spacing: 0.05em;
         font-family: 'Clash Display', system-ui, sans-serif;
+        transition: color 0.3s ease;
       }
 
       .panel-content {
@@ -325,21 +454,22 @@
         top: 50%;
         transform: translateY(-50%);
         padding: 0.5rem;
-        background: rgba(20, 20, 31, 0.9);
-        border: 1px solid rgba(45, 212, 191, 0.3);
+        background: var(--bg-panel);
+        border: 1px solid var(--border-color);
         border-radius: 0 0.5rem 0.5rem 0;
         cursor: pointer;
         transition: all 0.2s;
       }
 
       .panel-toggle:hover {
-        background: rgba(45, 212, 191, 0.2);
+        background: var(--accent-hover);
+        opacity: 0.8;
       }
 
       .panel-toggle svg {
         width: 1rem;
         height: 1rem;
-        color: var(--cyber-400);
+        color: var(--accent-color);
       }
 
       /* Right Panel */
@@ -350,10 +480,10 @@
         bottom: 0;
         z-index: 40;
         width: 20rem;
-        background: linear-gradient(to bottom, rgba(20, 20, 31, 0.9), rgba(10, 10, 15, 0.9));
+        background: var(--panel-bg);
         backdrop-filter: blur(12px);
-        border-left: 1px solid rgba(45, 212, 191, 0.2);
-        transition: transform 0.3s;
+        border-left: 1px solid var(--border-color);
+        transition: transform 0.3s, background 0.3s ease, border-color 0.3s ease;
         animation: slideInRight 0.3s;
       }
 
@@ -379,8 +509,8 @@
       }
 
       .info-card {
-        background: linear-gradient(135deg, rgba(20, 184, 166, 0.1), rgba(15, 118, 110, 0.05));
-        border: 1px solid rgba(45, 212, 191, 0.2);
+        background: var(--info-card-bg);
+        border: 1px solid var(--border-color);
         border-radius: 0.5rem;
         padding: 1rem;
         margin-bottom: 1rem;
@@ -389,23 +519,23 @@
       }
 
       .info-card:hover {
-        border-color: rgba(45, 212, 191, 0.5);
+        border-color: var(--accent-hover);
         box-shadow: 
-          0 0 20px rgba(45, 212, 191, 0.2),
-          inset 0 0 20px rgba(45, 212, 191, 0.05);
+          0 0 20px var(--primary-glow),
+          inset 0 0 20px var(--accent-glow);
         transform: translateY(-2px);
       }
 
       .info-card h3 {
         font-size: 0.875rem;
         font-weight: 500;
-        color: var(--slate-300);
+        color: var(--text-secondary);
         margin-bottom: 0.75rem;
       }
 
       .info-card p {
         font-size: 0.75rem;
-        color: var(--slate-500);
+        color: var(--text-muted);
         line-height: 1.5;
       }
 
@@ -413,13 +543,13 @@
         display: flex;
         justify-content: space-between;
         font-size: 0.75rem;
-        color: var(--slate-500);
+        color: var(--text-muted);
         margin-bottom: 0.5rem;
       }
 
       .info-card .info-value {
         font-family: 'JetBrains Mono', monospace;
-        color: #67e8f9;
+        color: var(--accent-color);
       }
 
       /* Viewer Container */
@@ -437,13 +567,14 @@
         position: absolute;
         inset: 0;
         z-index: 50;
-        background: rgba(10, 10, 15, 0.8);
+        background: var(--loading-overlay);
         backdrop-filter: blur(4px);
         display: none;
         align-items: center;
         justify-content: center;
         flex-direction: column;
         gap: 1rem;
+        transition: background 0.3s ease;
       }
 
       .loading-overlay.active {
@@ -462,8 +593,8 @@
         position: absolute;
         width: 40px;
         height: 40px;
-        border: 2px solid var(--cyber-400);
-        background: rgba(45, 212, 191, 0.1);
+        border: 2px solid var(--accent-color);
+        background: var(--accent-glow);
       }
 
       @keyframes rotate {
@@ -474,7 +605,7 @@
       .loading-text {
         font-size: 0.875rem;
         font-family: 'JetBrains Mono', monospace;
-        color: var(--cyber-400);
+        color: var(--accent-color);
       }
 
       /* Custom scrollbar */
@@ -484,17 +615,85 @@
       }
 
       ::-webkit-scrollbar-track {
-        background: rgba(15, 118, 110, 0.1);
+        background: var(--bg-secondary);
         border-radius: 4px;
       }
 
       ::-webkit-scrollbar-thumb {
-        background: linear-gradient(180deg, #2dd4bf, #0d9488);
+        background: linear-gradient(180deg, var(--accent-color), var(--cyber-600));
         border-radius: 4px;
       }
 
       ::-webkit-scrollbar-thumb:hover {
-        background: linear-gradient(180deg, #5eead4, #14b8a6);
+        background: linear-gradient(180deg, var(--cyber-500), var(--cyber-600));
+      }
+
+      /* Theme Selector Styles */
+      .theme-selector {
+        margin-bottom: 1rem;
+      }
+
+      .theme-selector label {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: var(--text-muted);
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .theme-options {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .theme-option {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem;
+        background: var(--info-card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .theme-option:hover {
+        border-color: var(--accent-hover);
+        background: var(--accent-glow);
+      }
+
+      .theme-option.active {
+        border-color: var(--accent-color);
+        background: var(--btn-bg);
+        box-shadow: 0 0 10px var(--primary-glow);
+      }
+
+      .theme-option input[type="radio"] {
+        margin: 0;
+        cursor: pointer;
+      }
+
+      .theme-option label {
+        flex: 1;
+        margin: 0;
+        cursor: pointer;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--text-secondary);
+        text-transform: none;
+        letter-spacing: normal;
+      }
+
+      .theme-option .theme-preview {
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+        border: 1px solid var(--border-color);
+        flex-shrink: 0;
       }
 
       /* BUI Panel overrides */
@@ -578,6 +777,15 @@
           </svg>
           <span>Load Model</span>
         </button>
+        <button class="btn-primary" id="clearBtn" title="Clear All Models">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            <line x1="10" y1="11" x2="10" y2="17"/>
+            <line x1="14" y1="11" x2="14" y2="17"/>
+          </svg>
+          <span>Clear</span>
+        </button>
 
         <div class="controls-group">
           <button class="btn-icon" id="resetCameraBtn" title="Reset Camera">
@@ -620,6 +828,27 @@
       <h2 class="panel-title">Controls</h2>
     </div>
     <div class="panel-content" id="leftPanelContent">
+      <!-- Theme Selector -->
+      <div class="theme-selector">
+        <label>Theme</label>
+        <div class="theme-options">
+          <div class="theme-option active" data-theme="cyberpunk">
+            <input type="radio" name="theme" id="theme-cyberpunk" value="cyberpunk" checked>
+            <label for="theme-cyberpunk">Cyberpunk</label>
+            <div class="theme-preview" style="background: linear-gradient(135deg, #0a0a0f, #2dd4bf);"></div>
+          </div>
+          <div class="theme-option" data-theme="cad">
+            <input type="radio" name="theme" id="theme-cad" value="cad">
+            <label for="theme-cad">White CAD</label>
+            <div class="theme-preview" style="background: linear-gradient(135deg, #ffffff, #3b82f6);"></div>
+          </div>
+          <div class="theme-option" data-theme="gray">
+            <input type="radio" name="theme" id="theme-gray" value="gray">
+            <label for="theme-gray">Desktop Gray</label>
+            <div class="theme-preview" style="background: linear-gradient(135deg, #1e293b, #94a3b8);"></div>
+          </div>
+        </div>
+      </div>
       <!-- BUI components will be inserted here -->
     </div>
     <button class="panel-toggle" id="leftPanelToggle">
