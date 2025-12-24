@@ -73,6 +73,10 @@ OBC.Views.defaultRange = 100;
 const casters = components.get(OBC.Raycasters);
 const caster = casters.get(world);
 
+// Initialize Clipper component for clipping planes
+const clipper = components.get(OBC.Clipper);
+clipper.enabled = true;
+
 // Store scene reference for controls (will be used later)
 let sceneInitialized = true;
 
@@ -117,13 +121,30 @@ fragments.list.onItemSet.add(async ({ value: model }) => {
   fragments.core.update(true);
   updateModelInfo();
   
-  // Enable shadows on model meshes
+  // Enable shadows on model meshes and ensure materials support clipping
   model.tiles.onItemSet.add(({ value: mesh }) => {
     if ("isMesh" in mesh) {
-      const mat = mesh.material as THREE.MeshStandardMaterial[];
-      if (mat[0]?.opacity === 1) {
+      const mat = mesh.material;
+      if (Array.isArray(mat) && mat[0]?.opacity === 1) {
         mesh.castShadow = true;
         mesh.receiveShadow = true;
+      } else if (!Array.isArray(mat) && (mat as THREE.Material)?.opacity === 1) {
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+      }
+      // Ensure materials support clipping
+      const renderer = world.renderer;
+      if (renderer) {
+        const clippingPlanes = renderer.clippingPlanes;
+        if (Array.isArray(mat)) {
+          for (const material of mat) {
+            if (material) {
+              material.clippingPlanes = clippingPlanes;
+            }
+          }
+        } else if (mat) {
+          (mat as THREE.Material).clippingPlanes = clippingPlanes;
+        }
       }
     }
   });
@@ -131,6 +152,25 @@ fragments.list.onItemSet.add(async ({ value: model }) => {
   for (const child of model.object.children) {
     child.castShadow = true;
     child.receiveShadow = true;
+  }
+  
+  // Update clipping planes for all meshes in the world
+  // The Clipper component will automatically update materials when planes are created,
+  // but we ensure new models get the current clipping planes set up
+  const renderer = world.renderer;
+  if (renderer) {
+    renderer.updateClippingPlanes();
+    const clippingPlanes = renderer.clippingPlanes;
+    for (const mesh of world.meshes) {
+      if (!mesh.material) continue;
+      if (Array.isArray(mesh.material)) {
+        for (const material of mesh.material) {
+          material.clippingPlanes = clippingPlanes;
+        }
+      } else {
+        mesh.material.clippingPlanes = clippingPlanes;
+      }
+    }
   }
   
   await world.scene.updateShadows();
@@ -290,6 +330,22 @@ rightPanelToggle.addEventListener("click", () => {
     rightPanel.classList.remove("hidden");
   } else {
     rightPanel.classList.add("hidden");
+  }
+});
+
+// Keyboard shortcut for deleting clipping planes
+window.addEventListener("keydown", (event) => {
+  if (event.code === "Delete" || event.code === "Backspace") {
+    if (clipper.enabled && clipper.list.size > 0) {
+      clipper.delete(world);
+    }
+  }
+});
+
+// Double-click to create clipping plane
+container.addEventListener("dblclick", async () => {
+  if (clipper.enabled) {
+    await clipper.create(world);
   }
 });
 
@@ -455,6 +511,79 @@ const createSceneControls = () => {
   viewControlsDiv.appendChild(planViewBtn);
   
   controlsDiv.appendChild(viewControlsDiv);
+
+  // Clipping Planes Controls
+  const clippingControlsDiv = document.createElement("div");
+  clippingControlsDiv.style.marginBottom = "1.5rem";
+  
+  const clippingTitle = document.createElement("h3");
+  clippingTitle.className = "panel-title";
+  clippingTitle.style.marginBottom = "0.75rem";
+  clippingTitle.textContent = "Clipping Planes";
+  clippingControlsDiv.appendChild(clippingTitle);
+  
+  // Create clipping plane button
+  const createClippingBtn = document.createElement("button");
+  createClippingBtn.className = "btn-primary";
+  createClippingBtn.style.width = "100%";
+  createClippingBtn.style.marginBottom = "0.5rem";
+  createClippingBtn.textContent = "Create Clipping Plane";
+  createClippingBtn.addEventListener("click", async () => {
+    if (clipper.enabled) {
+      await clipper.create(world);
+    }
+  });
+  clippingControlsDiv.appendChild(createClippingBtn);
+  
+  // Delete all clipping planes button
+  const deleteAllClippingBtn = document.createElement("button");
+  deleteAllClippingBtn.className = "btn-primary";
+  deleteAllClippingBtn.style.width = "100%";
+  deleteAllClippingBtn.style.marginBottom = "0.5rem";
+  deleteAllClippingBtn.textContent = "Delete All Planes";
+  deleteAllClippingBtn.addEventListener("click", () => {
+    clipper.deleteAll();
+  });
+  clippingControlsDiv.appendChild(deleteAllClippingBtn);
+  
+  // Toggle clipping planes enabled
+  const clippingEnabledControl = document.createElement("div");
+  clippingEnabledControl.style.marginBottom = "0.5rem";
+  
+  const clippingEnabledLabel = document.createElement("label");
+  clippingEnabledLabel.style.display = "flex";
+  clippingEnabledLabel.style.alignItems = "center";
+  clippingEnabledLabel.style.justifyContent = "space-between";
+  clippingEnabledLabel.style.cursor = "pointer";
+  clippingEnabledLabel.style.fontSize = "0.875rem";
+  clippingEnabledLabel.style.color = "var(--text-secondary)";
+  
+  const clippingEnabledText = document.createElement("span");
+  clippingEnabledText.textContent = "Clipping Enabled";
+  
+  const clippingEnabledCheckbox = document.createElement("input");
+  clippingEnabledCheckbox.type = "checkbox";
+  clippingEnabledCheckbox.id = "clippingEnabledCheckbox";
+  clippingEnabledCheckbox.checked = clipper.enabled;
+  clippingEnabledCheckbox.style.cursor = "pointer";
+  clippingEnabledCheckbox.addEventListener("change", () => {
+    clipper.enabled = clippingEnabledCheckbox.checked;
+  });
+  
+  clippingEnabledLabel.appendChild(clippingEnabledText);
+  clippingEnabledLabel.appendChild(clippingEnabledCheckbox);
+  clippingEnabledControl.appendChild(clippingEnabledLabel);
+  clippingControlsDiv.appendChild(clippingEnabledControl);
+  
+  // Clipping planes info
+  const clippingInfo = document.createElement("p");
+  clippingInfo.style.fontSize = "0.75rem";
+  clippingInfo.style.color = "var(--text-muted)";
+  clippingInfo.style.marginTop = "0.5rem";
+  clippingInfo.textContent = "Double-click to create plane, Delete key to remove";
+  clippingControlsDiv.appendChild(clippingInfo);
+  
+  controlsDiv.appendChild(clippingControlsDiv);
 
 
   // Lighting Options (Expandable)
