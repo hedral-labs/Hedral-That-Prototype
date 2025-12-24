@@ -31,23 +31,54 @@ const components = new OBC.Components();
 
 const worlds = components.get(OBC.Worlds);
 const world = worlds.create<
-  OBC.SimpleScene,
+  OBC.ShadowedScene,
   OBC.OrthoPerspectiveCamera,
   OBC.SimpleRenderer
 >();
-
-world.scene = new OBC.SimpleScene(components);
-world.scene.setup();
-world.scene.three.background = null;
 
 const container = document.getElementById("container")!;
 world.renderer = new OBC.SimpleRenderer(components, container);
 world.camera = new OBC.OrthoPerspectiveCamera(components);
 await world.camera.controls.setLookAt(78, 20, -2.2, 26, -4, 25);
 
+// Store container reference for plane selection
+const containerElement = container;
+
 components.init();
 
-components.get(OBC.Grids).create(world);
+world.scene = new OBC.ShadowedScene(components);
+world.scene.three.background = null;
+
+// Enable shadows on renderer
+world.renderer.three.shadowMap.enabled = true;
+world.renderer.three.shadowMap.type = THREE.PCFSoftShadowMap;
+
+// Set up shadowed scene
+world.scene.setup({
+  shadows: {
+    cascade: 1,
+    resolution: 1024,
+  },
+});
+
+const grid = components.get(OBC.Grids).create(world);
+world.scene.distanceRenderer.excludedObjects.add(grid.three);
+
+// Initialize Views component for 2D plan views
+const views = components.get(OBC.Views);
+views.world = world;
+OBC.Views.defaultRange = 100;
+
+// Initialize Raycasters for interactive plane selection
+const casters = components.get(OBC.Raycasters);
+const caster = casters.get(world);
+
+// Store scene reference for controls (will be used later)
+let sceneInitialized = true;
+
+// 2D Plan View state
+let currentView: OBC.View | null = null;
+let is2DViewActive = false;
 
 const ifcLoader = components.get(OBC.IfcLoader);
 
@@ -75,15 +106,34 @@ const workerUrl = URL.createObjectURL(workerFile);
 const fragments = components.get(OBC.FragmentsManager);
 fragments.init(workerUrl);
 
-world.camera.controls.addEventListener("rest", () =>
-  fragments.core.update(true),
-);
+world.camera.controls.addEventListener("rest", async () => {
+  fragments.core.update(true);
+  await world.scene.updateShadows();
+});
 
-fragments.list.onItemSet.add(({ value: model }) => {
+fragments.list.onItemSet.add(async ({ value: model }) => {
   model.useCamera(world.camera.three);
   world.scene.three.add(model.object);
   fragments.core.update(true);
   updateModelInfo();
+  
+  // Enable shadows on model meshes
+  model.tiles.onItemSet.add(({ value: mesh }) => {
+    if ("isMesh" in mesh) {
+      const mat = mesh.material as THREE.MeshStandardMaterial[];
+      if (mat[0]?.opacity === 1) {
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+      }
+    }
+  });
+  
+  for (const child of model.object.children) {
+    child.castShadow = true;
+    child.receiveShadow = true;
+  }
+  
+  await world.scene.updateShadows();
 });
 
 const downloadFragments = async () => {
@@ -306,4 +356,262 @@ if (themeSelect) {
     setTheme(target.value as Theme);
   });
 }
+
+// 2D Plan View Functions
+const switchTo2DPlanView = async (point?: THREE.Vector3, normal?: THREE.Vector3) => {
+  if (!point || !normal) {
+    // Default plan view from top (Y-up)
+    point = new THREE.Vector3(0, 0, 0);
+    normal = new THREE.Vector3(0, 1, 0);
+  }
+  
+  // Invert normal so view looks down
+  const invertedNormal = normal.clone().negate();
+  
+  // Close any existing view
+  if (currentView) {
+    views.close();
+    views.list.delete(currentView.id);
+  }
+  
+  // Create new plan view
+  currentView = views.create(invertedNormal, point, {
+    id: "PlanView",
+    world,
+  });
+  
+  // Set appropriate range
+  currentView.range = 50;
+  currentView.helpersVisible = false;
+  
+  // Open the view
+  views.open("PlanView");
+  is2DViewActive = true;
+  
+  // Update UI
+  const planViewBtn = document.getElementById("planViewBtn") as HTMLButtonElement;
+  if (planViewBtn) planViewBtn.textContent = "Switch to 3D";
+};
+
+const switchTo3DView = () => {
+  if (currentView) {
+    views.close();
+    is2DViewActive = false;
+    
+    // Update UI
+    const planViewBtn = document.getElementById("planViewBtn") as HTMLButtonElement;
+    if (planViewBtn) planViewBtn.textContent = "Switch to 2D Plan";
+  }
+};
+
+const togglePlanView = async () => {
+  if (is2DViewActive) {
+    switchTo3DView();
+  } else {
+    // Get center of loaded models for default plane position
+    let centerPoint = new THREE.Vector3(0, 0, 0);
+    if (fragments.list.size > 0) {
+      const [model] = fragments.list.values();
+      if (model) {
+        model.box.getCenter(centerPoint);
+      }
+    }
+    await switchTo2DPlanView(centerPoint, new THREE.Vector3(0, 1, 0));
+  }
+};
+
+
+// Scene Configuration Controls
+const createSceneControls = () => {
+  const controlsDiv = document.createElement("div");
+  controlsDiv.className = "scene-controls";
+  controlsDiv.style.marginTop = "1.5rem";
+  controlsDiv.style.paddingTop = "1.5rem";
+  controlsDiv.style.borderTop = "1px solid var(--border-color)";
+
+  const title = document.createElement("h3");
+  title.className = "panel-title";
+  title.style.marginBottom = "1rem";
+  title.textContent = "Scene Settings";
+  controlsDiv.appendChild(title);
+  
+  // 2D Plan View Controls
+  const viewControlsDiv = document.createElement("div");
+  viewControlsDiv.style.marginBottom = "1.5rem";
+  
+  const viewTitle = document.createElement("h3");
+  viewTitle.className = "panel-title";
+  viewTitle.style.marginBottom = "0.75rem";
+  viewTitle.textContent = "2D Plan View";
+  viewControlsDiv.appendChild(viewTitle);
+  
+  // Switch to 2D/3D button
+  const planViewBtn = document.createElement("button");
+  planViewBtn.id = "planViewBtn";
+  planViewBtn.className = "btn-primary";
+  planViewBtn.style.width = "100%";
+  planViewBtn.textContent = "Switch to 2D Plan";
+  planViewBtn.addEventListener("click", togglePlanView);
+  viewControlsDiv.appendChild(planViewBtn);
+  
+  controlsDiv.appendChild(viewControlsDiv);
+
+  // Shadows Toggle
+  const shadowsControl = document.createElement("div");
+  shadowsControl.style.marginBottom = "1rem";
+  
+  const shadowsLabel = document.createElement("label");
+  shadowsLabel.style.display = "flex";
+  shadowsLabel.style.alignItems = "center";
+  shadowsLabel.style.justifyContent = "space-between";
+  shadowsLabel.style.cursor = "pointer";
+  shadowsLabel.style.fontSize = "0.875rem";
+  shadowsLabel.style.color = "var(--text-secondary)";
+  
+  const shadowsText = document.createElement("span");
+  shadowsText.textContent = "Shadows";
+  
+  const shadowsCheckbox = document.createElement("input");
+  shadowsCheckbox.type = "checkbox";
+  shadowsCheckbox.id = "shadowsCheckbox";
+  shadowsCheckbox.checked = world.scene.shadowsEnabled;
+  shadowsCheckbox.style.cursor = "pointer";
+  shadowsCheckbox.addEventListener("change", () => {
+    world.scene.shadowsEnabled = shadowsCheckbox.checked;
+  });
+  
+  shadowsLabel.appendChild(shadowsText);
+  shadowsLabel.appendChild(shadowsCheckbox);
+  shadowsControl.appendChild(shadowsLabel);
+  controlsDiv.appendChild(shadowsControl);
+
+  // Shadow Resolution
+  const shadowResControl = document.createElement("div");
+  shadowResControl.style.marginBottom = "1rem";
+  
+  const shadowResLabel = document.createElement("label");
+  shadowResLabel.style.display = "block";
+  shadowResLabel.style.fontSize = "0.75rem";
+  shadowResLabel.style.color = "var(--text-muted)";
+  shadowResLabel.style.marginBottom = "0.5rem";
+  shadowResLabel.textContent = "Shadow Resolution";
+  shadowResControl.appendChild(shadowResLabel);
+  
+  const shadowResInput = document.createElement("input");
+  shadowResInput.type = "range";
+  shadowResInput.id = "shadowResInput";
+  shadowResInput.min = "256";
+  shadowResInput.max = "2048";
+  shadowResInput.step = "256";
+  shadowResInput.value = "1024";
+  shadowResInput.style.width = "100%";
+  shadowResInput.style.cursor = "pointer";
+  
+  const shadowResValue = document.createElement("span");
+  shadowResValue.style.display = "block";
+  shadowResValue.style.fontSize = "0.75rem";
+  shadowResValue.style.color = "var(--text-muted)";
+  shadowResValue.style.marginTop = "0.25rem";
+  shadowResValue.textContent = `1024px`;
+  
+  shadowResInput.addEventListener("input", () => {
+    const value = parseInt(shadowResInput.value);
+    shadowResValue.textContent = `${value}px`;
+    world.scene.setup({
+      shadows: {
+        cascade: 1,
+        resolution: value,
+      },
+    });
+    world.scene.updateShadows();
+  });
+  
+  shadowResControl.appendChild(shadowResInput);
+  shadowResControl.appendChild(shadowResValue);
+  controlsDiv.appendChild(shadowResControl);
+
+  // Ambient Light Intensity
+  const ambientIntensityControl = document.createElement("div");
+  ambientIntensityControl.style.marginBottom = "1rem";
+  
+  const ambientIntensityLabel = document.createElement("label");
+  ambientIntensityLabel.style.display = "block";
+  ambientIntensityLabel.style.fontSize = "0.75rem";
+  ambientIntensityLabel.style.color = "var(--text-muted)";
+  ambientIntensityLabel.style.marginBottom = "0.5rem";
+  ambientIntensityLabel.textContent = "Ambient Light";
+  ambientIntensityControl.appendChild(ambientIntensityLabel);
+  
+  const ambientIntensityInput = document.createElement("input");
+  ambientIntensityInput.type = "range";
+  ambientIntensityInput.id = "ambientIntensityInput";
+  ambientIntensityInput.min = "0";
+  ambientIntensityInput.max = "10";
+  ambientIntensityInput.step = "0.1";
+  ambientIntensityInput.value = world.scene.config.ambientLight.intensity.toString();
+  ambientIntensityInput.style.width = "100%";
+  ambientIntensityInput.style.cursor = "pointer";
+  
+  const ambientIntensityValue = document.createElement("span");
+  ambientIntensityValue.style.display = "block";
+  ambientIntensityValue.style.fontSize = "0.75rem";
+  ambientIntensityValue.style.color = "var(--text-muted)";
+  ambientIntensityValue.style.marginTop = "0.25rem";
+  ambientIntensityValue.textContent = world.scene.config.ambientLight.intensity.toFixed(1);
+  
+  ambientIntensityInput.addEventListener("input", () => {
+    const value = parseFloat(ambientIntensityInput.value);
+    world.scene.config.ambientLight.intensity = value;
+    ambientIntensityValue.textContent = value.toFixed(1);
+  });
+  
+  ambientIntensityControl.appendChild(ambientIntensityInput);
+  ambientIntensityControl.appendChild(ambientIntensityValue);
+  controlsDiv.appendChild(ambientIntensityControl);
+
+  // Directional Light Intensity
+  const directionalIntensityControl = document.createElement("div");
+  directionalIntensityControl.style.marginBottom = "1rem";
+  
+  const directionalIntensityLabel = document.createElement("label");
+  directionalIntensityLabel.style.display = "block";
+  directionalIntensityLabel.style.fontSize = "0.75rem";
+  directionalIntensityLabel.style.color = "var(--text-muted)";
+  directionalIntensityLabel.style.marginBottom = "0.5rem";
+  directionalIntensityLabel.textContent = "Directional Light";
+  directionalIntensityControl.appendChild(directionalIntensityLabel);
+  
+  const directionalIntensityInput = document.createElement("input");
+  directionalIntensityInput.type = "range";
+  directionalIntensityInput.id = "directionalIntensityInput";
+  directionalIntensityInput.min = "0";
+  directionalIntensityInput.max = "10";
+  directionalIntensityInput.step = "0.1";
+  directionalIntensityInput.value = world.scene.config.directionalLight.intensity.toString();
+  directionalIntensityInput.style.width = "100%";
+  directionalIntensityInput.style.cursor = "pointer";
+  
+  const directionalIntensityValue = document.createElement("span");
+  directionalIntensityValue.style.display = "block";
+  directionalIntensityValue.style.fontSize = "0.75rem";
+  directionalIntensityValue.style.color = "var(--text-muted)";
+  directionalIntensityValue.style.marginTop = "0.25rem";
+  directionalIntensityValue.textContent = world.scene.config.directionalLight.intensity.toFixed(1);
+  
+  directionalIntensityInput.addEventListener("input", () => {
+    const value = parseFloat(directionalIntensityInput.value);
+    world.scene.config.directionalLight.intensity = value;
+    directionalIntensityValue.textContent = value.toFixed(1);
+  });
+  
+  directionalIntensityControl.appendChild(directionalIntensityInput);
+  directionalIntensityControl.appendChild(directionalIntensityValue);
+  controlsDiv.appendChild(directionalIntensityControl);
+
+  return controlsDiv;
+};
+
+// Add scene controls to left panel
+const sceneControls = createSceneControls();
+leftPanelContent.appendChild(sceneControls);
 
