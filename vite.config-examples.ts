@@ -59,6 +59,12 @@ export default defineConfig({
       "top-level-await": true,
     },
   },
+  resolve: {
+    alias: {
+      "@thatopen/components": path.resolve(__dirname, "./packages/core/src/index.ts"),
+      "@thatopen/components-front": path.resolve(__dirname, "./packages/front/src/index.ts"),
+    },
+  },
   build: {
     outDir: "./examples",
     rollupOptions: {

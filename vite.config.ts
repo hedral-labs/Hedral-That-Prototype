@@ -60,4 +60,10 @@ const createIndex = () => ({
 
 export default defineConfig({
   plugins: [createIndex()],
+  resolve: {
+    alias: {
+      "@thatopen/components": path.resolve(__dirname, "./packages/core/src/index.ts"),
+      "@thatopen/components-front": path.resolve(__dirname, "./packages/front/src/index.ts"),
+    },
+  },
 });

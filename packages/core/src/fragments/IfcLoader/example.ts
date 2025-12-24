@@ -87,8 +87,15 @@ await ifcLoader.setup({
   When an IFC file is converted to Fragments, another component handles the converted file: the FragmentsManager. Therefore, it is essential to configure this component first before attempting to "load" any IFC file:
 */
 
-const workerUrl =
+// Fetch the worker and create a blob URL to avoid CORS issues
+const githubUrl =
   "https://thatopen.github.io/engine_fragment/resources/worker.mjs";
+const fetchedUrl = await fetch(githubUrl);
+const workerBlob = await fetchedUrl.blob();
+const workerFile = new File([workerBlob], "worker.mjs", {
+  type: "text/javascript",
+});
+const workerUrl = URL.createObjectURL(workerFile);
 const fragments = components.get(OBC.FragmentsManager);
 fragments.init(workerUrl);
 
@@ -179,7 +186,13 @@ const [panel, updatePanel] = BUI.Component.create<BUI.PanelSection, {}>((_) => {
     const onLoadIfc = async ({ target }: { target: BUI.Button }) => {
       target.label = "Conversion in progress...";
       target.loading = true;
-      await loadIfc("https://thatopen.github.io/engine_components/resources/ifc/school_str.ifc");
+      // Convert Google Drive sharing URL to direct download URL
+      const googleDriveUrl = "https://drive.google.com/file/d/14EiwE2hENtso7xy_tOW8NFSqvHH4Hgqm/view?usp=sharing";
+      const fileId = googleDriveUrl.match(/\/d\/([a-zA-Z0-9_-]+)/)?.[1];
+      const directDownloadUrl = fileId 
+        ? `https://drive.google.com/uc?export=download&id=${fileId}`
+        : googleDriveUrl;
+      await loadIfc(directDownloadUrl);
       target.loading = false;
       target.label = "Load IFC";
     };
